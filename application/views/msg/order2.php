@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>销售信息</title>
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<link rel="stylesheet" href="<?php echo base_url(); ?>/res/layui/css/layui.css" media="all">
+	<script src="<?php echo base_url(); ?>/res/js/win10.child.js"></script>
+	<script type="text/javascript" src="<?php echo base_url(); ?>/res/js/jquery-2.2.4.min.js"></script>
+	<script src="<?php echo base_url(); ?>/res/js/win10.child.js"></script>
+</head>
+<body>
+<div class="oapd">
+	<blockquote class="layui-elem-quote layui-text" style="font-weight: bold;font-size: 20px;color: #222;">
+		用户<?= $this->input->get('memberid') ?>-  <?php echo $name; ?> 订单信息
+	</blockquote>
+	<div class="layui-form-item layui-form">
+		<form action="" method="get">
+			<div class="layui-inline">
+				<input type="hidden" name="userid" value="<?php echo $_GET['userid'] ?>">
+				<input type="hidden" name="name" value="<?php echo $_GET['name'] ?>">
+				<input type="hidden" name="memberid" value="<?php echo $_GET['memberid'] ?>">
+				<label class="layui-form-label" style="padding: 9px 0;text-align: left">查询日期</label>
+				<div class="layui-input-inline">
+					<input type="text" name="begintime" id="begintime" lay-verify="date" value="<?= $this->input->get('begintime')?$this->input->get('begintime'):date('Y-m-d')?>"
+						   placeholder="yyyy-MM-dd" autocomplete="off" class="layui-input">
+				</div>
+				<div class="layui-form-mid">-</div>
+				<div class="layui-input-inline">
+					<input type="text" name="endtime" id="endtime" lay-verify="date"
+						   value="<?= $this->input->get('endtime')?$this->input->get('endtime'):date('Y-m-d')?>" placeholder="yyyy-MM-dd" autocomplete="off"
+						   class="layui-input">
+				</div>
+				<button class="layui-btn" type="submit">查询</button>
+			</div>
+		</form>
+
+	</div>
+	<div class="layui-form">
+		<table class="layui-table" lay-size="sm">
+			<thead>
+			<tr>
+
+				<th>时间</th>
+				<th>用户信息</th>
+				<th>备注</th>
+
+
+				<th>归属部门</th>
+				<th>业务员</th>
+				<th>业务部门</th>
+				<th>预约员</th>
+				<th>订单总额</th>
+				<th>支付方式</th>
+				<th>支付单据号</th>
+				<th>支付总额</th>
+				<th>状态</th>
+			</tr>
+			</thead>
+			<tbody>
+			<?php foreach ($list as $v){ ?>
+				<?php if ($v->state ==2 ) {?>
+				<tr style="color: deeppink"  onclick="Win10_child.openUrl('/index.php/msg/orderlist?info=<?php echo base64_encode(json_encode($v->sub));?>&name=<?= $name?>&memberid=<?= $this->input->get('memberid') ?>','订单详情')">
+				<?php }else {?>
+					<tr onclick="Win10_child.openUrl('/index.php/msg/orderlist?info=<?php echo base64_encode(json_encode($v->sub));?>&name=<?= $name?>&memberid=<?= $this->input->get('memberid') ?>','订单详情')">
+
+				<?php }?>
+					<td>
+						<p>交易时间:<?= $v->addtime ?></p>
+						<p>预约时间:<?= $v->appointmenttime ?></p>
+					</td>
+					<td>
+						<p>用户类型:<?= $v->customertype?></p>
+						<p>姓名:<?= $v->name?></p>
+						<p>电话:<?= $v->telephone?></p>
+						<p>地址:<?= $v->city.$v->area.$v->town.$v->street.$v->housenumber.$v->address ?></p>
+						<p>用户等级:<?= $v->viplevel?></p>
+						<p style="color:red;font-size: 14px;font-weight: bold">余额:<?= $v->balance?></p>
+					</td>
+
+					<td><?= $v->remarks ?></td>
+
+
+					<td><?= $v->attributiondepartment ?></td>
+					<td><?= $v->salesman ?></td>
+					<td><?= $v->department ?></td>
+					<td><?= $v->registrar ?></td>
+					<td><?= $v->ordertotal ?></td>
+					<td><?= $v->payment ?></td>
+					<td><?= $v->payserial ?></td>
+					<td><?= $v->paytotal ?></td>
+					<td><?= getstate($v->state) ?></td>
+				</tr>
+			<?php } ?>
+			</tbody>
+		</table>
+	</div>
+</div>
+</body>
+<script src="<?php echo base_url(); ?>/res/layui/layui.js" charset="utf-8"></script>
+<script>
+    layui.use(['jquery', 'form', 'layedit', 'laydate', 'element'], function () {
+        var form = layui.form
+            , layer = layui.layer
+            , layedit = layui.layedit
+            , laydate = layui.laydate
+            , element = layui.element
+            , $ = layui.$;
+        //日期
+        laydate.render({
+            elem: '#begintime'
+        });
+        laydate.render({
+            elem: '#endtime'
+        });
+
+    });
+</script>
+
+</html>

@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport"
+		  content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<script src="<?php echo base_url(); ?>res/js/vue.js" charset="utf-8"></script>
+	<script src="<?php echo base_url(); ?>res/js/axios.js" charset="utf-8"></script>
+	<link href="<?php echo base_url(); ?>/res/css/tailwind-ui.min.css" rel="stylesheet">
+	<script src="<?php echo base_url(); ?>res/js/sweetalert2.min.js"></script>
+	<script src="<?php echo base_url(); ?>res/js/core.js"></script>
+	<script src="<?php echo base_url(); ?>res/js/win10.child.js"></script>
+	<link href="<?php echo base_url(); ?>res/css/sweetalert2.min.css" rel="stylesheet">
+	<script src="<?php echo base_url(); ?>res/js/vuetable-2.js"></script>
+	<link rel="stylesheet" href="<?php echo base_url(); ?>res/css/index.css">
+	<!-- 引入组件库 -->
+	<script src="<?php echo base_url(); ?>res/js/index.js"></script>
+
+	!-- 引入样式 -->
+	<link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+	<!-- 引入组件库 -->
+	<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+	<title></title>
+</head>
+<body>
+<div id="app" class="p-6">
+	<div class="flex">
+		<p class="p-2 border-2 border-r-0 rounded-l">开始时间</p>
+		<input class="p-2 border-2 rounded-r" type="date" v-model="begintime">
+		<p class="p-2 border-2 border-r-0 rounded-l ml-3">结束时间</p>
+		<input class="p-2 border-2 rounded-r" type="date" v-model="endtime">
+		<button @click="submit" class="p-1 px-5 mx-5 bg-teal-500 text-white rounded">搜索</button>
+	</div>
+
+	<table class="table-auto mt-6 w-full text-xs">
+		<thead>
+		<tr>
+			<th class=" border-2">订单号</th>
+
+			<th class=" border-2">录入时间</th>
+			<th class=" border-2">钢瓶类型</th>
+			<th class=" border-2">登记号</th>
+			<th class=" border-2">条形码内容</th>
+			<th class=" border-2">出厂日期</th>
+			<th class=" border-2">检测日期</th>
+			<th class=" border-2">下检日期</th>
+			<th class=" border-2">录入部门</th>
+			<th class=" border-2">录入人</th>
+			<th class=" border-2">打印次数</th>
+			<th class=" border-2">操作</th>
+		</tr>
+		</thead>
+		<tbody>
+
+		<tr class="text-center" v-for="v in list">
+			<td class="border-2 ">{{ v.serial}}</td>
+			<td class="border-2 ">{{ v.addtime}}</td>
+			<td class="border-2 ">{{ v.bottletype}}</td>
+			<td class="border-2 ">{{ v.regnumber}}</td>
+			<td class="border-2 ">{{ v.code}}</td>
+			<td class="border-2 ">{{ v.date4manufacture}}</td>
+			<td class="border-2 ">{{ v.date4testing}}</td>
+			<td class="border-2 ">{{ v.date4nexttesting}}</td>
+			<td class="border-2 ">{{ v.department}}</td>
+			<td class="border-2 ">{{ v.operator}}</td>
+			<td class="border-2 ">{{ v.printnum}}</td>
+			<td class="border-2 ">
+				<button @click="cancle(v)" class="p-2 bg-teal-500 text-white">取消</button>
+			</td>
+		</tr>
+
+		</tbody>
+	</table>
+</div>
+</body>
+<script>
+	new Vue({
+		el: '#app',
+		data() {
+			return {
+				begintime: '',
+				endtime: '',
+				department: ''
+			}
+		},
+		methods: {
+			submit() {
+				axios.post('/index.php/api/ReprintCodeRecord', {
+					begintime: this.begintime,
+					endtime: this.endtime,
+				}).then(rew => {
+					console.log(rew.data)
+				})
+			},
+			getQueryVariable(variable) {
+				var query = window.location.search.substring(1)
+				var vars = query.split('&')
+				for (var i = 0; i < vars.length; i++) {
+					var pair = vars[i].split('=')
+					if (pair[0] == variable) {
+						return pair[1]
+					}
+				}
+				return ''
+			}
+		},
+		created() {
+			this.begintime = this.getQueryVariable('endtime')
+			this.endtime = this.getQueryVariable('endtime')
+			$.ajax({
+				url: '/index.php/api/RetirementInventory',
+				method: 'post',
+				dataType: 'json',
+				data: {
+					info: data,
+					memberid: <?= $this->input->get('memberid')?>
+		},
+			success: function (rew) {
+				if (rew.code == 200) {
+					var data = rew.printinfo
+					var jsonp = {
+						title: '南宁三燃公司会员退指标订单',
+						time: data.topinfo,
+						memberid: '卡号 ' + data.memberid,
+						name: '姓名 ' + data.name,
+						Memo1: '退指标款：' + Number(data.pay_cash),
+						Memo2: data.goods,
+						Memo3: '账户余额：' + Number(data.balance),
+						Memo4: '操作员: ' + data.operator,
+						Memo5: '用户签名：'
+					}
+					var data_infop = {
+						PrintData: jsonp,
+						Print: true
+					}
+					axios.get('http://127.0.0.1:8000/api/print/order/8/?data=' + JSON.stringify(data_infop)).then(rew => {
+						console.log(rew)
+					})
+					alert('操作成功')
+					$('form').submit()
+				}
+			}
+		})
+		}
+	})
+</script>
+</html>
